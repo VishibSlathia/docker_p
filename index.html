@@ -9,8 +9,8 @@
 
     <script>
         const messagesDiv = document.getElementById('messages');
-        const responderNumber = window.location.pathname.split('/')[1];
-        const ws = new WebSocket(`ws://${window.location.host}/ws/${responderNumber}`);
+        const responderNumber = window.location.pathname.split('/')[1].replace('responder', '');
+        const ws = new WebSocket(`ws://${window.location.host}/${window.location.pathname}/ws/${responderNumber}`);
 
         ws.onmessage = function(event) {
             const message = event.data;
