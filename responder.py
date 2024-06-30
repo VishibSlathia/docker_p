@@ -1,31 +1,15 @@
 import asyncio
+import websockets
 import socket
-from aiohttp import web
 
-async def index(request):
-    return web.FileResponse('./index.html')
-
-async def websocket_handler(request):
-    ws = web.WebSocketResponse()
-    await ws.prepare(request)
-
+async def send_message(websocket, path):
     ip_address = socket.gethostbyname(socket.gethostname())
-    responder_number = request.match_info['responder']
-    
-    try:
-        while True:
-            message = f"Hello from Responder {responder_number} ({ip_address})!"
-            await ws.send_str(message)
-            await asyncio.sleep(5)
-    finally:
-        await ws.close()
-    return ws
+    while True:
+        message = f"Hello from {ip_address}!"
+        await websocket.send(message)
+        await asyncio.sleep(5)
 
-async def main():
-    app = web.Application()
-    app.router.add_get('/', index)
-    app.router.add_get('/ws/{responder}', websocket_handler)
-    return app
+start_server = websockets.serve(send_message, "0.0.0.0", 8080)
 
-if __name__ == '__main__':
-    web.run_app(main(), host='0.0.0.0', port=8000)
+asyncio.get_event_loop().run_until_complete(start_server)
+asyncio.get_event_loop().run_forever()

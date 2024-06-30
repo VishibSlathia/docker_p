@@ -2,7 +2,7 @@ version: '3'
 
 services:
   nginx:
-    image: nginx:alpine
+    image: nginx:latest
     ports:
       - "80:80"
     volumes:
@@ -10,13 +10,29 @@ services:
     depends_on:
       - responder1
       - responder2
+    networks:
+      - frontend
+      - backend
 
   responder1:
     build: .
     expose:
-      - "8000"
+      - "8080"
+    networks:
+      - backend
+    dns: []
 
   responder2:
     build: .
     expose:
-      - "8000"
+      - "8080"
+    networks:
+      - backend
+    dns: []
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true
